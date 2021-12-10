@@ -78,7 +78,6 @@ class TestClassKotlin : Activity() {
     //当函数的函数体只有一行时，使用”=“连接
     fun getValue(name: String?, sex: String?, age: String?): String = (name + sex + age)
 
-
     private fun getMaxAge(age1:Int, age2:Int) = if(age1 > age2) age1 else age2
 
     private fun getSexTitle(sex: String): String {
