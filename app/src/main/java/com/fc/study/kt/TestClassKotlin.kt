@@ -8,11 +8,12 @@ import android.widget.TextView
 import com.fc.study.const.INTENT_AGE
 import com.fc.study.const.INTENT_NAME
 import com.fc.study.const.INTENT_SEX
+import com.fc.study.inter.StudyInterface
 import java.util.*
 
 private const val TAG: String = "TestClassKotlin"
 
-class TestClassKotlin : Activity(), View.OnClickListener {
+class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
     //val var
     private val test1 = "test1"
     private var test2 = "test2"
@@ -356,6 +357,153 @@ class TestClassKotlin : Activity(), View.OnClickListener {
 
     }
 
+    private fun lambdaTest(){
+        //1.Lambda 就是一段可以作为参数传递的代码，它可以作为函数的参数，返回值，同时也可以赋值给一个变量
+        val list = listOf("Apple","Banana","Orange","Pear","Grape","Watermelon")
+        val lambda = {title: String -> title.length}
+        val maxLengthTitle = list.maxByOrNull(lambda)
+        println("maxLengthTitle: $maxLengthTitle")
+        //2.集合函数式API通过lambda表达式
+        val maxLengthTitle2 = list.minByOrNull({
+                title:String -> title.length
+        })
+        println("maxLengthTitle2: $maxLengthTitle2")
+        //3Kotlin 中规定，当 Lambda 表达式作为函数的最后一个参数的时候，我们可以把 Lambda 表达式移到函数括号的外面
+        val maxLengthTitle3 = list.maxByOrNull(){
+                title: String -> title.length
+        }
+        println("maxLengthTitle3: $maxLengthTitle3")
+
+        //4.Kotlin 中规定，当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
+        val maxLengthTitle4 = list.maxByOrNull {
+                title: String -> title.length
+        }
+        println("maxLengthTitle4: $maxLengthTitle4")
+
+        //5.当 Lambda 表达式的参数列表中只有一个参数的时候，我们可以把参数给省略，默认会有个 it 参数
+        val maxLengthTitle5 = list.maxByOrNull{
+            it.length
+        }
+        println("maxLengthTitle5: $maxLengthTitle5")
+    }
+
+    private fun javaFunctionTest() {
+        Thread(object: Runnable{
+            override fun run() {
+                println("Thread-Id1: ${Thread.currentThread()}")
+            }
+        }).start()
+
+        //lambda简化
+        Thread(Runnable {
+            println("Thread-Id2: ${Thread.currentThread()}")
+        }).start()
+
+        //因为是单抽象方法接口，我们可以将接口名进行省略
+        Thread({
+            println("Thread-Id3: ${Thread.currentThread()}")
+        }).start()
+
+        //当 Lambda 表达式作为函数的最后一个参数的时候，我们可以把 Lambda 表达式移到函数括号的外面
+        Thread(){
+            println("Thread-Id4: ${Thread.currentThread()}")
+        }.start()
+
+        //当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
+        Thread{
+            println("Thread-Id5: ${Thread.currentThread()}")
+        }.start()
+    }
+
+    private fun nullSafeTest() {
+        //1）、在类型后面加上 ? ，表示可空类型，Kotlin 默认所有的参数和变量不可为空
+        val nullTest1:Button? = null
+        //2）、在对象调用的时候，使用 ?. 操作符，它表示如果当前对象不为空则调用，为空则什么都不做
+        nullTest1?.text = "nullTest"
+        //3）、?: 操作符表示如果左边的结果不为空，返回左边的结果，否则返回右边的结果
+        var a = 1
+        val b = 2
+        val c = 3
+        a = b ?: c
+        println("flag $a")
+        //4）、在对象后面加 !! 操作符表示告诉Kotlin我这里一定不会为空,你不用进行检测了，如果为空，则抛出空指针异常
+        var nullTest2:Map<String,String>? = null
+        nullTest2 = mutableMapOf<String,String>()
+        nullTest2["name"] = "yy"
+        println("nullTest2: ${nullTest2!!.get("name")}")
+        //5）、let 函数，提供函数式 Api，并把当前调用的对象当作参数传递到 Lambda 表达式中
+    }
+
+    private fun letTest(studyInterface: StudyInterface?) {
+        studyInterface?.readBooks()
+        studyInterface?.doHomeWork()
+        studyInterface?.write()
+
+        println("----------------------let----------------------")
+        studyInterface.let {
+            it?.readBooks()
+            it?.doHomeWork()
+            it?.write()
+        }
+
+    }
+
+    private fun standardFunction() {
+        //标准函数let,also,with,run,apply
+
+        val name = "yangyang"
+        val age = 20
+
+        //1）、let 函数，必须让某个对象调用，接收一个 Lambda 表达式参数，Lambda 表达式中的参数为当前调用者，且最后一行代码作为返回值
+        val returnValue1 = StringBuilder().let {
+            it.append(name).append(" ").append(age)
+        }
+        println("returnValue1: $returnValue1")
+
+        //2）、also 函数，必须让某个对象调用，接收一个 Lambda 表达式参数，Lambda 表达式中的参数为当前调用者，无法指定返回值，这个函数返回的是当前调用对象本身
+        val returnValue2 = StringBuilder().also {
+            it.append(name).append(" ").append(age)
+        }
+        println("returnValue3: $returnValue2")
+
+        //3）、with 函数，接收两个参数，第一个为任意类型参数，第二个为 Lambda 表达式参数，Lambda 表达式中拥有第一个参数的上下文 this ，且最后一行代码作为返回值
+        val returnValue3 = with(StringBuilder()) {
+            this.append(name).append(" ").append(age)
+        }
+        println("returnValue3: $returnValue3")
+
+        //4）、run 函数，必须让某个对象调用，接收一个 Lambda 表达式参数，Lambda 表达式中拥有当前调用对象的上下文 this ，且最后一行代码作为返回值
+        val returnValue4 = StringBuilder().run {
+            this.append(name).append(" ").append(age)
+        }
+        println("returnValue4: $returnValue4")
+        //5）、apply 函数，必须让某个对象调用，接收一个 Lambda 表达式参数，Lambda 表达式中拥有当前调用对象的上下文 this ，无法指定返回值，这个函数返回的是当前调用对象本身
+        val stringBuilder5 = StringBuilder().apply {
+            this.append(name).append(" ").append(age)
+        }
+        println("stringBuilder5: $stringBuilder5")
+    }
+
+    private fun staticMethod() {
+
+    }
+
+    private fun lateInitTest() {
+        println("-----------lateInitTest-------------")
+    }
+
+    private fun sealedClassTest() {
+        println("-----------sealedClassTest-------------")
+    }
+
+    private fun genericTest() {
+        println("-----------genericTest-------------")
+    }
+
+    private fun coroutineTest() {
+        println("-----------coroutineTest-------------")
+    }
+
 
     override fun onClick(view: View?) {
         when (view?.id) {
@@ -387,6 +535,39 @@ class TestClassKotlin : Activity(), View.OnClickListener {
                 arrayTest()
                 //集合
                 collectionTest()
+
+                //lambda表达式
+                lambdaTest()
+
+                //空指针检查
+                nullSafeTest()
+
+                //let函数
+                letTest(this)
+
+                //标准函数
+                standardFunction()
+
+                //静态方法
+                staticMethod()
+
+                //延迟初始化和密封类
+                lateInitTest()
+
+                //密封类
+                sealedClassTest()
+
+                //泛型
+                genericTest()
+
+                //协程
+                coroutineTest()
+
+
+
+                //Java函数式Api的使用
+                javaFunctionTest()
+
             }
             else -> {
 
@@ -394,4 +575,16 @@ class TestClassKotlin : Activity(), View.OnClickListener {
         }
     }
 
+
+    override fun readBooks() {
+        println("StudyInterface-readBooks")
+    }
+
+    override fun doHomeWork() {
+        println("StudyInterface-doHomeWork")
+    }
+
+    override fun write() {
+        println("StudyInterface-write")
+    }
 }
