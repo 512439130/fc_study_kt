@@ -5,10 +5,12 @@
       <map>
         <entry key="..\:/Program Files/workspace/fc_study_kt/app/src/main/res/layout/activity_class_kotlin.xml" value="0.10054347826086957" />
         <entry key="..\:/Program Files/workspace/fc_study_kt/app/src/main/res/layout/activity_main.xml" value="0.5297029702970297" />
+        <entry key="..\:/workspace/study/kotlin_workspace/fc_study_kt/app/src/main/res/layout/activity_class_kotlin.xml" value="0.19635416666666666" />
+        <entry key="..\:/workspace/study/kotlin_workspace/fc_study_kt/app/src/main/res/layout/activity_main.xml" value="0.2821557971014493" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

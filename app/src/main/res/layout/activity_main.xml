@@ -10,29 +10,49 @@
         android:id="@+id/tv_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="用户系统"
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    <Button
-        android:id="@+id/btn_test1"
-        android:layout_width="wrap_content"
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tv_content"
+        android:hint="请输入姓名"
         app:layout_constraintLeft_toLeftOf="@id/tv_content"
         app:layout_constraintRight_toRightOf="@id/tv_content"
-        android:layout_marginTop="10dp"
-        android:text="test1"
+        app:layout_constraintTop_toBottomOf="@id/tv_content"
+        />
+    <EditText
+        android:id="@+id/et_sex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/et_username"
+        app:layout_constraintRight_toRightOf="@id/et_username"
+        app:layout_constraintTop_toBottomOf="@id/et_username"
+        android:hint="请输入性别"
+        />
+    <EditText
+        android:id="@+id/et_age"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/et_sex"
+        app:layout_constraintRight_toRightOf="@id/et_sex"
+        app:layout_constraintTop_toBottomOf="@id/et_sex"
+        android:hint="请输入年龄"
         />
 
+
     <Button
-        android:id="@+id/btn_test2"
+        android:id="@+id/btn_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="@id/btn_test1"
-        app:layout_constraintRight_toRightOf="@id/btn_test1"
-        app:layout_constraintTop_toBottomOf="@id/btn_test1"
-        android:text="test2"/>
+        app:layout_constraintLeft_toLeftOf="@id/et_age"
+        app:layout_constraintRight_toRightOf="@id/et_age"
+        app:layout_constraintTop_toBottomOf="@id/et_age"
+        android:text="登录"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

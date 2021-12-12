@@ -1,57 +1,77 @@
 package com.fc.study.kt
 
+import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
+import android.text.Editable
+import android.text.TextUtils
 import android.view.View
 import android.widget.Button
-import com.fc.study.const.*
+import android.widget.EditText
+import com.fc.study.base.BaseActivity
+import com.fc.study.const.INTENT_AGE
+import com.fc.study.const.INTENT_NAME
+import com.fc.study.const.INTENT_SEX
+import com.fc.study.inter.ActivityInterface
 
-class MainActivity : AppCompatActivity() {
-    private val test1 = "test1"
-    private var test2 = "test2"
-    private val test3: Int = 666
-    private var test4: Double = 88.88
-    private var test5: String = "test5"
+class MainActivity : BaseActivity(), View.OnClickListener, ActivityInterface {
+    private lateinit var btnLogin: Button
+    private lateinit var etUsername: EditText
+    private lateinit var etSex: EditText
+    private lateinit var etAge: EditText
 
-    private lateinit var btnTest1:Button
-    private lateinit var btnTest2:Button
+    private lateinit var username: String
+    private lateinit var sex: String
+    private lateinit var age: String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        init()
+    override fun getLayoutId(): Int {
+        return R.layout.activity_main
     }
 
-    private fun init() {
-        btnTest1 = findViewById(R.id.btn_test1)
-        btnTest1.setOnClickListener(View.OnClickListener {
-            test()
-        })
+    override fun init() {
+        initView()
+    }
 
-        btnTest2 = findViewById(R.id.btn_test2)
-        btnTest2.setOnClickListener {
-//            val intent = Intent(this,TestClassKotlin().javaClass)
-            val intent = Intent(this,TestClassKotlin::class.java)
-            intent.putExtra(INTENT_NAME,"杨阳")
-            intent.putExtra(INTENT_SEX,"男")
-            intent.putExtra(INTENT_AGE, "27")
-            startActivity(intent)
+    private fun initView() {
+        btnLogin = findViewById(R.id.btn_login)
+        btnLogin.setOnClickListener(this)
+        etUsername = findViewById(R.id.et_username)
+        etSex = findViewById(R.id.et_sex)
+        etAge = findViewById(R.id.et_age)
+
+        etUsername.setText("杨阳")
+        etSex.text = Editable.Factory.getInstance().newEditable("男")
+        etAge.text = Editable.Factory.getInstance().newEditable("27")
+    }
+
+
+    override fun onClick(view: View?) {
+        when (view?.id) {
+            R.id.btn_login -> {
+                username = etUsername.text.toString()
+                sex = etSex.text.toString()
+                age = etAge.text.toString()
+                login(username, sex, age)
+            }
+            else -> {
+
+            }
         }
     }
 
-    private fun test() {
-        test2 = "test2 new"
-        test4 = 10.23
-        println("test1 $test1")
-        println("test2 $test2")
-        println("test3 $test3")
-        println("test4 $test4")
-        println("test5 $test5")
-
-        ConstObject.test()
-        fileTest()
+    private fun login(username: String, sex: String, age: String) {
+        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(sex) && !TextUtils.isEmpty(age)) {
+            val intent = Intent(this, TestClassKotlin::class.java)
+            intent.putExtra(INTENT_NAME, username)
+            intent.putExtra(INTENT_SEX, sex)
+            intent.putExtra(INTENT_AGE, age)
+            startActivity(intent)
+        } else {
+            check()
+            toast(this, "请输入")
+        }
     }
 
-
+    override fun showToast(context: Context, content: String) {
+        toast(this,content)
+    }
 }
