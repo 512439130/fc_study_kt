@@ -1,3 +1,4 @@
+@file:JvmName("TopTestUtil")
 package com.fc.study.kt
 
 //修饰顶层的常量，不在class中

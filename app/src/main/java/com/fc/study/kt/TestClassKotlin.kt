@@ -1,5 +1,6 @@
 package com.fc.study.kt
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import android.view.View
@@ -9,10 +10,11 @@ import com.fc.study.const.INTENT_AGE
 import com.fc.study.const.INTENT_NAME
 import com.fc.study.const.INTENT_SEX
 import com.fc.study.inter.StudyInterface
+import com.fc.study.stat.SingleClassTest
 import java.util.*
 
 private const val TAG: String = "TestClassKotlin"
-
+@SuppressLint("SetTextI18n")
 class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
     //val var
     private val test1 = "test1"
@@ -36,7 +38,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 
     private fun init() {
         initView()
-        initData();
+        initData()
     }
 
     private fun initView() {
@@ -283,7 +285,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
         println("testSet1Result: $testSet1Result")
 
         //创建一个可变Set集合
-        val testSet2 = mutableSetOf<String>("Set-001", "Set-002", "Set-003")
+        val testSet2 = mutableSetOf("Set-001", "Set-002", "Set-003")
         testSet2.add("Set-003")
         testSet2.add("Set-005")
         println("testSet2: $testSet2")
@@ -312,17 +314,17 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 
     private fun loopTest() {
         println("--------------------loopTest--------------------")
-        var j: Int = 0
+        var j = 0
         while (j <= 15) {
             print("$j ")
             j++
         }
         println()
 
-        var k: Int = 0
+        var k = 0
         do {
             print("$k ")
-            k++;
+            k++
         } while (k < 15)
         println()
 
@@ -363,16 +365,16 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
         val lambda = {title: String -> title.length}
         val maxLengthTitle = list.maxByOrNull(lambda)
         println("maxLengthTitle: $maxLengthTitle")
-        //2.集合函数式API通过lambda表达式
-        val maxLengthTitle2 = list.minByOrNull({
-                title:String -> title.length
-        })
-        println("maxLengthTitle2: $maxLengthTitle2")
+//        //2.集合函数式API通过lambda表达式
+//        val maxLengthTitle2 = list.minByOrNull({
+//                title:String -> title.length
+//        })
+//        println("maxLengthTitle2: $maxLengthTitle2")
         //3Kotlin 中规定，当 Lambda 表达式作为函数的最后一个参数的时候，我们可以把 Lambda 表达式移到函数括号的外面
-        val maxLengthTitle3 = list.maxByOrNull(){
-                title: String -> title.length
-        }
-        println("maxLengthTitle3: $maxLengthTitle3")
+//        val maxLengthTitle3 = list.maxByOrNull(){
+//                title: String -> title.length
+//        }
+//        println("maxLengthTitle3: $maxLengthTitle3")
 
         //4.Kotlin 中规定，当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
         val maxLengthTitle4 = list.maxByOrNull {
@@ -388,26 +390,26 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
     }
 
     private fun javaFunctionTest() {
-        Thread(object: Runnable{
-            override fun run() {
-                println("Thread-Id1: ${Thread.currentThread()}")
-            }
-        }).start()
+//        Thread(object: Runnable{
+//            override fun run() {
+//                println("Thread-Id1: ${Thread.currentThread()}")
+//            }
+//        }).start()
 
         //lambda简化
-        Thread(Runnable {
-            println("Thread-Id2: ${Thread.currentThread()}")
-        }).start()
+//        Thread(Runnable {
+//            println("Thread-Id2: ${Thread.currentThread()}")
+//        }).start()
 
         //因为是单抽象方法接口，我们可以将接口名进行省略
-        Thread({
-            println("Thread-Id3: ${Thread.currentThread()}")
-        }).start()
+//        Thread({
+//            println("Thread-Id3: ${Thread.currentThread()}")
+//        }).start()
 
         //当 Lambda 表达式作为函数的最后一个参数的时候，我们可以把 Lambda 表达式移到函数括号的外面
-        Thread(){
-            println("Thread-Id4: ${Thread.currentThread()}")
-        }.start()
+//        Thread(){
+//            println("Thread-Id4: ${Thread.currentThread()}")
+//        }.start()
 
         //当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
         Thread{
@@ -415,22 +417,23 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
         }.start()
     }
 
+
     private fun nullSafeTest() {
         //1）、在类型后面加上 ? ，表示可空类型，Kotlin 默认所有的参数和变量不可为空
         val nullTest1:Button? = null
         //2）、在对象调用的时候，使用 ?. 操作符，它表示如果当前对象不为空则调用，为空则什么都不做
         nullTest1?.text = "nullTest"
         //3）、?: 操作符表示如果左边的结果不为空，返回左边的结果，否则返回右边的结果
-        var a = 1
-        val b = 2
+        val a: Int
+        val b = null
         val c = 3
         a = b ?: c
         println("flag $a")
         //4）、在对象后面加 !! 操作符表示告诉Kotlin我这里一定不会为空,你不用进行检测了，如果为空，则抛出空指针异常
-        var nullTest2:Map<String,String>? = null
-        nullTest2 = mutableMapOf<String,String>()
-        nullTest2["name"] = "yy"
-        println("nullTest2: ${nullTest2!!.get("name")}")
+//        var nullTest2:Map<String,String>? = null
+//        nullTest2 = mutableMapOf<String,String>()
+//        nullTest2["name"] = "yy"
+//        println("nullTest2: ${nullTest2!!.get("name")}")
         //5）、let 函数，提供函数式 Api，并把当前调用的对象当作参数传递到 Lambda 表达式中
     }
 
@@ -457,6 +460,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
         //1）、let 函数，必须让某个对象调用，接收一个 Lambda 表达式参数，Lambda 表达式中的参数为当前调用者，且最后一行代码作为返回值
         val returnValue1 = StringBuilder().let {
             it.append(name).append(" ").append(age)
+            it.append("~~~")
         }
         println("returnValue1: $returnValue1")
 
@@ -485,7 +489,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
     }
 
     private fun staticMethod() {
-
+        println("-----------staticMethod-------------")
     }
 
     private fun lateInitTest() {
@@ -515,9 +519,9 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
                 println(getValue(tv2.text.toString(), tv3.text.toString()))
                 println(getValue(tv1?.text?.toString(), tv2.text.toString(), tv3.text.toString()))
 
-                var age1: Int = 16
+                var age1 = 16
                 age1 += 1
-                var age2: Int = 28
+                var age2 = 28
                 age2 -= 1
                 //when
                 println(getMaxAge(age1, age2))
@@ -563,10 +567,10 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
                 //协程
                 coroutineTest()
 
-
-
                 //Java函数式Api的使用
                 javaFunctionTest()
+
+                SingleClassTest.doAction()
 
             }
             else -> {
