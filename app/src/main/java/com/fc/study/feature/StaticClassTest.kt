@@ -1,5 +1,5 @@
-//顶层方法的类重命名：StatusUtil.topTest()
-@file:JvmName("StatusUtil")
+//顶层方法的类重命名：StaticUtil.topTest()
+@file:JvmName("StaticUtil")
 package com.fc.study.stat
 
 //Kotlin 静态方法方式
@@ -17,13 +17,12 @@ class StaticClassTest {
     //为当前类创建伴生类
     companion object Test{
         @JvmStatic
-        fun doStatusAction(){
-            println("companion-object-doStatusAction")
+        fun doStaticAction(){
+            println("companion-object-doStaticAction")
         }
         fun doAction(){
             println("companion-object-doAction")
         }
-
     }
 
     fun main(){
@@ -35,10 +34,10 @@ class StaticClassTest {
 object SingleClassTest {
     @JvmStatic
     fun doStaticAction(){
-        println("-------------doStaticAction-----------")
+        println("-------------SingleClassTest-doStaticAction-----------")
     }
 
     fun doAction(){
-        println("-------------doAction-----------")
+        println("-------------SingleClassTest-doAction-----------")
     }
 }

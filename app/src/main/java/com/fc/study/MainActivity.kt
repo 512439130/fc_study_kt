@@ -1,4 +1,4 @@
-package com.fc.study.kt
+package com.fc.study
 
 import android.content.Context
 import android.content.Intent
@@ -12,6 +12,8 @@ import com.fc.study.const.INTENT_AGE
 import com.fc.study.const.INTENT_NAME
 import com.fc.study.const.INTENT_SEX
 import com.fc.study.inter.ActivityInterface
+import com.fc.study.kt.R
+import com.fc.study.kt.TestClassKotlin
 
 class MainActivity : BaseActivity(), View.OnClickListener, ActivityInterface {
     private lateinit var btnLogin: Button

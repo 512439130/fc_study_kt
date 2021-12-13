@@ -9,13 +9,21 @@ import android.widget.TextView
 import com.fc.study.const.INTENT_AGE
 import com.fc.study.const.INTENT_NAME
 import com.fc.study.const.INTENT_SEX
+import com.fc.study.data.DataClassTest
+import com.fc.study.feature.*
 import com.fc.study.inter.StudyInterface
 import com.fc.study.stat.SingleClassTest
+import com.fc.study.stat.StaticClassTest
+import com.fc.study.stat.topTest
 import java.util.*
 
 private const val TAG: String = "TestClassKotlin"
+
+/**
+ * Kotlin 基础学习
+ */
 @SuppressLint("SetTextI18n")
-class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
+class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, GenericInterfaceTest<String> {
     //val var
     private val test1 = "test1"
     private var test2 = "test2"
@@ -23,12 +31,20 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
     private var test4: Double = 88.88
     private var test5: String = "test5"
 
-
-    //lateinit：延迟初始化
     private lateinit var btnTest: Button
     private var tv1: TextView? = null
     private lateinit var tv2: TextView
     private lateinit var tv3: TextView
+
+    //lateinit：延迟初始化
+    private lateinit var testLateInit: String
+
+    //使用 by lazy 对一个变量延迟初始化
+    //特点：该属性调用的时候才会初始化，且 lazy 后面的 Lambda 表达式只会执行一次
+    val testByLazyTest: String by lazy {
+        println("lazy init testByLazyTest")
+        "this is kt"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -359,10 +375,10 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 
     }
 
-    private fun lambdaTest(){
+    private fun lambdaTest() {
         //1.Lambda 就是一段可以作为参数传递的代码，它可以作为函数的参数，返回值，同时也可以赋值给一个变量
-        val list = listOf("Apple","Banana","Orange","Pear","Grape","Watermelon")
-        val lambda = {title: String -> title.length}
+        val list = listOf("Apple", "Banana", "Orange", "Pear", "Grape", "Watermelon")
+        val lambda = { title: String -> title.length }
         val maxLengthTitle = list.maxByOrNull(lambda)
         println("maxLengthTitle: $maxLengthTitle")
 //        //2.集合函数式API通过lambda表达式
@@ -377,13 +393,13 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 //        println("maxLengthTitle3: $maxLengthTitle3")
 
         //4.Kotlin 中规定，当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
-        val maxLengthTitle4 = list.maxByOrNull {
-                title: String -> title.length
+        val maxLengthTitle4 = list.maxByOrNull { title: String ->
+            title.length
         }
         println("maxLengthTitle4: $maxLengthTitle4")
 
         //5.当 Lambda 表达式的参数列表中只有一个参数的时候，我们可以把参数给省略，默认会有个 it 参数
-        val maxLengthTitle5 = list.maxByOrNull{
+        val maxLengthTitle5 = list.maxByOrNull {
             it.length
         }
         println("maxLengthTitle5: $maxLengthTitle5")
@@ -412,7 +428,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 //        }.start()
 
         //当 Lambda 表达式是函数的唯一参数的时候，函数的括号可以省略
-        Thread{
+        Thread {
             println("Thread-Id5: ${Thread.currentThread()}")
         }.start()
     }
@@ -420,7 +436,7 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 
     private fun nullSafeTest() {
         //1）、在类型后面加上 ? ，表示可空类型，Kotlin 默认所有的参数和变量不可为空
-        val nullTest1:Button? = null
+        val nullTest1: Button? = null
         //2）、在对象调用的时候，使用 ?. 操作符，它表示如果当前对象不为空则调用，为空则什么都不做
         nullTest1?.text = "nullTest"
         //3）、?: 操作符表示如果左边的结果不为空，返回左边的结果，否则返回右边的结果
@@ -490,18 +506,86 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
 
     private fun staticMethod() {
         println("-----------staticMethod-------------")
+        //1.1 伴生类-@JvmStatic-静态方法
+        StaticClassTest.doStaticAction()
+        //1.2 单例类-@JvmStatic-静态方法
+        SingleClassTest.doStaticAction()
+        //2.顶层方法-静态方法
+        topTest()
+
+        //伴生类
+        StaticClassTest.doAction()
+        //单例类
+        SingleClassTest.doAction()
     }
 
     private fun lateInitTest() {
         println("-----------lateInitTest-------------")
+
+        println("testInitTest-isInitialized1: ${::testLateInit.isInitialized}")
+        if (!::testLateInit.isInitialized) {
+            testLateInit = "this is kotlin"
+            println("testInitTest-isInitialized2: ${::testLateInit.isInitialized}")
+        }
+        println("testInitTest-value: $testLateInit")
+
+        println("-----------ByLazyTest-------------")
+        println("testByLazyTest $testByLazyTest")
     }
 
     private fun sealedClassTest() {
         println("-----------sealedClassTest-------------")
+        val content1 = sealedTest(result = Success)
+        println("sealedClassTest $content1")
+        val result2: Result2
+        result2 = Error2()
+        val content2 = interfaceTest(result2)
+        println("interfaceTest $content2")
+    }
+
+    private fun dataClassTest() {
+        println("-----------dataClassTest-------------")
+        val dataTest1 = DataClassTest()
+        println("dataClassTest-dataTest1-init: $dataTest1")
+        dataTest1.name = "yangyang"
+        dataTest1.sex = "男"
+        dataTest1.age = 27
+        println("dataClassTest-dataTest1-set: $dataTest1")
+
+        val dataTest2 = DataClassTest(name = "SoMustYY",sex = "男",age = 28)
+        println("dataClassTest-dataTest2: $dataTest2")
+        //copy
+        val newDataTest2 = dataTest2.copy(name = "Summer",)
+        println("dataClassTest-newDataTest2: $newDataTest2")
+        //componentN:解构声明
+        val(name,sex,age) = newDataTest2
+        println("dataClassTest-componentN-name: $name")
+        println("dataClassTest-componentN-name: $sex")
+        println("dataClassTest-componentN-name: $age")
+    }
+
+    private fun extensionTest() {
+        println("-----------extensionTest-------------")
+        val stringTest = "SoMustYY"
+        println("genericTest ${stringTest.printValue()}")
     }
 
     private fun genericTest() {
         println("-----------genericTest-------------")
+
+        val genericTest1 = GenericClassTest<String>()
+        genericTest1.genericTest("SoMustYY")
+
+        val genericTest2 = GenericClassTest2()
+        genericTest2.genericTest("SoMustYY")
+        genericTest2.genericTest(666)
+
+        val genericInterface = this
+        genericInterface.interfaceMethod("SoMustYY")
+    }
+
+    override fun interfaceMethod(params: String) {
+        println("interfaceMethod ${params.toString()}")
     }
 
     private fun coroutineTest() {
@@ -561,6 +645,12 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
                 //密封类
                 sealedClassTest()
 
+                //数据类
+                dataClassTest()
+
+                //扩展函数
+                extensionTest()
+
                 //泛型
                 genericTest()
 
@@ -578,7 +668,6 @@ class TestClassKotlin : Activity(), View.OnClickListener,StudyInterface {
             }
         }
     }
-
 
     override fun readBooks() {
         println("StudyInterface-readBooks")

@@ -1,9 +1,10 @@
 package com.fc.study.java;
 
+import com.fc.study.kt.ConstObject;
 import com.fc.study.kt.TopTestUtil;
 import com.fc.study.stat.SingleClassTest;
 import com.fc.study.stat.StaticClassTest;
-import com.fc.study.stat.StatusUtil;
+import com.fc.study.stat.StaticUtil;
 
 
 public class JavaMain {
@@ -11,12 +12,12 @@ public class JavaMain {
 
 
         //1.1 伴生类-@JvmStatic-静态方法
-        StaticClassTest.Test.doStatusAction();
+        StaticClassTest.Test.doStaticAction();
         //1.2 单例类-@JvmStatic-静态方法
         SingleClassTest.doStaticAction();
 
         //2.顶层方法-静态方法
-        StatusUtil.topTest();
+        StaticUtil.topTest();
 
         //单例类
         SingleClassTest.INSTANCE.doAction();
@@ -24,5 +25,8 @@ public class JavaMain {
         StaticClassTest.Test.doAction();
         //顶层方法
         TopTestUtil.fileTest();
+
+        //单例类
+        ConstObject.INSTANCE.test();
     }
 }
