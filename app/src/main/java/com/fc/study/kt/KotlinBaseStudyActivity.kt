@@ -3,9 +3,11 @@ package com.fc.study.kt
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import com.fc.study.const.INTENT_AGE
 import com.fc.study.const.INTENT_NAME
 import com.fc.study.const.INTENT_SEX
@@ -15,6 +17,7 @@ import com.fc.study.inter.StudyInterface
 import com.fc.study.stat.SingleClassTest
 import com.fc.study.stat.StaticClassTest
 import com.fc.study.stat.topTest
+import kotlinx.coroutines.*
 import java.util.*
 
 private const val TAG: String = "TestClassKotlin"
@@ -31,39 +34,62 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
     private var test4: Double = 88.88
     private var test5: String = "test5"
 
-    private lateinit var btnTest: Button
     private var tv1: TextView? = null
     private lateinit var tv2: TextView
     private lateinit var tv3: TextView
+    private lateinit var tvContentBlocking: TextView
+    private lateinit var tvContentLaunch: TextView
+
+    private lateinit var btnKTStudy: Button
+    private lateinit var btnCoroutineBlocking: Button
+    private lateinit var btnCoroutineLaunch: Button
+    private lateinit var btnCoroutineLaunchCancel: Button
 
     //lateinit：延迟初始化
     private lateinit var testLateInit: String
+    //coroutineTestContent
+    var coroutineBlockingContent = ""
+    var coroutineLaunchContent = ""
 
     //使用 by lazy 对一个变量延迟初始化
     //特点：该属性调用的时候才会初始化，且 lazy 后面的 Lambda 表达式只会执行一次
-    val testByLazyTest: String by lazy {
+    private val testByLazyTest: String by lazy {
         println("lazy init testByLazyTest")
         "this is kt"
     }
 
+    private lateinit var launchJobTest:Job
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_class_kotlin)
+        setContentView(R.layout.activity_kotlin_base_study)
         init()
     }
 
     private fun init() {
         initView()
         initData()
+        initListener()
     }
 
     private fun initView() {
-        btnTest = findViewById(R.id.btn_test)
-
         tv1 = findViewById(R.id.tv_1)
         tv2 = findViewById(R.id.tv_2)
         tv3 = findViewById(R.id.tv_3)
-        btnTest.setOnClickListener(this)
+        tvContentBlocking = findViewById(R.id.tv_content_blocking)
+        tvContentLaunch = findViewById(R.id.tv_content_launch)
+
+        btnKTStudy = findViewById(R.id.btn_kt_study)
+        btnCoroutineBlocking = findViewById(R.id.btn_coroutine_blocking)
+        btnCoroutineLaunch = findViewById(R.id.btn_coroutine_launch)
+        btnCoroutineLaunchCancel = findViewById(R.id.btn_coroutine_launch_cancel)
+    }
+
+    private fun initListener() {
+        btnKTStudy.setOnClickListener(this)
+        btnCoroutineBlocking.setOnClickListener(this)
+        btnCoroutineLaunch.setOnClickListener(this)
+        btnCoroutineLaunchCancel.setOnClickListener(this)
     }
 
     private fun initData() {
@@ -373,6 +399,13 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         }
         println()
 
+
+        //repeat循环
+        repeat(times = 10){
+            print("$it ")
+        }
+        println()
+
     }
 
     private fun lambdaTest() {
@@ -405,7 +438,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         println("maxLengthTitle5: $maxLengthTitle5")
     }
 
-    private fun javaFunctionTest() {
+    private fun javaLambdaOptimizationTest() {
 //        Thread(object: Runnable{
 //            override fun run() {
 //                println("Thread-Id1: ${Thread.currentThread()}")
@@ -468,7 +501,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
     }
 
     private fun standardFunction() {
-        //标准函数let,also,with,run,apply
+        //内联扩展函数let,also,with,run,apply
 
         val name = "yangyang"
         val age = 20
@@ -502,6 +535,35 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
             this.append(name).append(" ").append(age)
         }
         println("stringBuilder5: $stringBuilder5")
+
+        functionTest()
+    }
+
+    //apply函数的返回值是本身，在函数内部可以任意调用对象的属性或方法或给属性赋值等操作
+    private fun functionTest(){
+        //let函数
+        letTest(this)
+
+        val data:DataClassTest? = DataClassTest()
+        data?.apply {
+            name = "Test Name"
+            sex = "Test Sex"
+            age = 18
+        }?.hello()
+
+        data?.run {
+            name = "Test run Name"
+            sex = "Test run Sex"
+            age = 18
+        }
+        data?.hello()
+
+        with(data){
+            this?.name = "Test run Name"
+            this?.sex = "Test run Sex"
+            this?.age = 18
+        }
+
     }
 
     private fun staticMethod() {
@@ -584,18 +646,58 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         genericInterface.interfaceMethod("SoMustYY")
     }
 
-    override fun interfaceMethod(params: String) {
-        println("interfaceMethod ${params.toString()}")
+    private fun coroutineBlockingTest() {
+        println("-----------coroutineBlockingTest-start-------------")
+        Log.e(TAG, "主线程id：${mainLooper.thread.id}")
+
+        //runBlocking（阻塞式线程）启动的协程任务会阻断当前线程，直到协程执行结束，当协程执行结束后，页面才会显示出来
+        runBlocking {
+            repeat(times = 5) {
+                val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
+                coroutineBlockingContent += currentContent
+                Log.d(TAG,currentContent)
+                //延迟1000ms
+                delay(1000)
+            }
+            //协程执行结束，再执行下边的逻辑
+            tvContentBlocking.text = coroutineBlockingContent
+        }
+        println("-----------coroutineBlockingTest-end-------------")
+
     }
 
-    private fun coroutineTest() {
-        println("-----------coroutineTest-------------")
+    private fun coroutineLaunchTest(){
+        if(!::launchJobTest.isInitialized || !launchJobTest.isActive){
+            coroutineLaunchContent = ""
+            tvContentLaunch.text = coroutineLaunchContent
+            println("-----------coroutineLaunchTest-start-------------")
+            Log.e(TAG, "主线程id：${mainLooper.thread.id}")
+            launchJobTest = GlobalScope.launch {
+                repeat(times = 5){
+                    delay(2000)
+                    val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
+                    coroutineLaunchContent += currentContent
+                    Log.d(TAG,currentContent)
+                    withContext(Dispatchers.Main){
+                        tvContentLaunch.text = coroutineLaunchContent
+                    }
+                }
+                Log.e(TAG, "协程执行结束")
+            }
+        } else {
+            Toast.makeText(this,"Launch 正在执行",Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    override fun interfaceMethod(params: String) {
+        println("interfaceMethod $params")
     }
 
 
     override fun onClick(view: View?) {
         when (view?.id) {
-            R.id.btn_test -> {
+            R.id.btn_kt_study -> {
                 // val var const
                 testValVarConst()
 
@@ -626,20 +728,19 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
                 //lambda表达式
                 lambdaTest()
+                //lambda简化
+                javaLambdaOptimizationTest()
 
                 //空指针检查
                 nullSafeTest()
 
-                //let函数
-                letTest(this)
-
-                //标准函数
+                //内联扩展函数
                 standardFunction()
 
                 //静态方法
                 staticMethod()
 
-                //延迟初始化和密封类
+                //延迟初始化
                 lateInitTest()
 
                 //密封类
@@ -653,16 +754,23 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
                 //泛型
                 genericTest()
-
-                //协程
-                coroutineTest()
-
-                //Java函数式Api的使用
-                javaFunctionTest()
-
-                SingleClassTest.doAction()
-
             }
+            R.id.btn_coroutine_blocking -> {
+                //协程-阻塞式
+                coroutineBlockingTest()
+            }
+            R.id.btn_coroutine_launch -> {
+                //协程-非阻塞式
+                coroutineLaunchTest()
+            }
+            R.id.btn_coroutine_launch_cancel -> {
+
+                if(::launchJobTest.isInitialized){
+                    launchJobTest.cancel()
+                }
+            }
+
+            //协程-阻塞式
             else -> {
 
             }

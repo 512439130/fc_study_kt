@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/tv_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:textColor="@color/color_black"
+        android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/tv_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/tv_1"
+        app:layout_constraintTop_toBottomOf="@id/tv_1"
+        app:layout_constraintRight_toRightOf="@+id/tv_1"
+        android:textColor="@color/color_black"
+        android:textSize="18sp"/>
+    <TextView
+        android:id="@+id/tv_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/tv_2"
+        app:layout_constraintTop_toBottomOf="@id/tv_2"
+        app:layout_constraintRight_toRightOf="@+id/tv_2"
+        android:textColor="@color/color_black"
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/btn_kt_study"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_3"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_text_kt_study_test"/>
+
+    <TextView
+        android:id="@+id/tv_coroutine_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/btn_kt_study"
+        app:layout_constraintRight_toRightOf="@id/btn_kt_study"
+        app:layout_constraintTop_toBottomOf="@id/btn_kt_study"
+        android:text="@string/btn_text_coroutine_title"
+        android:layout_marginTop="20dp"
+
+        android:textSize="24sp"/>
+
+    <Button
+        android:id="@+id/btn_coroutine_blocking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_coroutine_title"
+        android:text="@string/btn_text_coroutine_blocking"/>
+
+
+
+    <TextView
+        android:id="@+id/tv_content_blocking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btn_coroutine_blocking"
+        android:textColor="@color/color_black"
+        android:textSize="14sp"/>
+
+    <Button
+        android:id="@+id/btn_coroutine_launch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btn_coroutine_launch_cancel"
+        app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
+        android:text="@string/btn_text_coroutine_launch"/>
+
+    <Button
+        android:id="@+id/btn_coroutine_launch_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/btn_coroutine_launch"
+        app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
+        app:layout_constraintRight_toRightOf="parent"
+
+        android:text="@string/btn_text_coroutine_launch_cancel"/>
+
+    <TextView
+        android:id="@+id/tv_content_launch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btn_coroutine_launch"
+        android:textColor="@color/color_black"
+        android:textSize="14sp"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

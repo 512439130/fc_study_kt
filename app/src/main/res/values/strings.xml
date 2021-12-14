@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">fc_study_kt</string>
+    <string name="app_name">KT_Study</string>
+    <string name="btn_text_kt_study_test">Study Test</string>
+
+    <string name="btn_text_coroutine_title">Coroutine Study</string>
+    <string name="btn_text_coroutine_blocking">Blocking</string>
+    <string name="btn_text_coroutine_blocking_cancel"> cancel</string>
+
+    <string name="btn_text_coroutine_launch">Launch</string>
+    <string name="btn_text_coroutine_launch_cancel">cancel</string>
 </resources>

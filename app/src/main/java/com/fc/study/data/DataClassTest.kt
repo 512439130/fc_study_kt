@@ -21,4 +21,8 @@ data class DataClassTest(
     constructor():this("zhanghui","女",25){
         println("constructor...")
     }
+
+    fun hello(){
+        println("${name}_${sex}_${age}")
+    }
 }
