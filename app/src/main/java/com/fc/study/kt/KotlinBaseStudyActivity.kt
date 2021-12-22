@@ -2,6 +2,7 @@ package com.fc.study.kt
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -18,15 +19,33 @@ import com.fc.study.stat.SingleClassTest
 import com.fc.study.stat.StaticClassTest
 import com.fc.study.stat.topTest
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.produce
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 private const val TAG: String = "TestClassKotlin"
+
+var acquired = 0
+
+class Resource {
+    init {
+        acquired++  // Acquire the resource
+    }
+
+    fun close() {
+        acquired--
+    }
+}
 
 /**
  * Kotlin 基础学习
  */
 @SuppressLint("SetTextI18n")
-class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, GenericInterfaceTest<String> {
+class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
+    GenericInterfaceTest<String> {
     //val var
     private val test1 = "test1"
     private var test2 = "test2"
@@ -42,11 +61,21 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
     private lateinit var btnKTStudy: Button
     private lateinit var btnCoroutineBlocking: Button
-    private lateinit var btnCoroutineLaunch: Button
-    private lateinit var btnCoroutineLaunchCancel: Button
+    private lateinit var btnCoroutineInit: Button
+    private lateinit var btnCoroutineStart: Button
+    private lateinit var btnCoroutineCancel: Button
+    private lateinit var btnCoroutineContextTest: Button
+    private lateinit var btnCoroutineLaunchModeTest: Button
+    private lateinit var btnCoroutineAsyncTest: Button
+    private lateinit var btnCoroutineSuspendTest: Button
+    private lateinit var btnCoroutineFinallyTest: Button
+    private lateinit var btnCoroutineTimeOutTest: Button
+    private lateinit var btnCoroutineCombinedSuspendTest: Button
+    private lateinit var btnCoroutineChannelTest: Button
 
     //lateinit：延迟初始化
     private lateinit var testLateInit: String
+
     //coroutineTestContent
     var coroutineBlockingContent = ""
     var coroutineLaunchContent = ""
@@ -58,7 +87,11 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         "this is kt"
     }
 
-    private lateinit var launchJobTest:Job
+    //协程作用域
+    private lateinit var scopeTest: CoroutineScope
+
+    //协程
+    private lateinit var jobTest: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,6 +105,24 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         initListener()
     }
 
+    private fun initJob() {
+        println("-----------job-init-------------")
+        //GlobalScope.launch有可能导致无法预料的内存泄漏
+        scopeTest = CoroutineScope(context = Dispatchers.Main)
+        jobTest = scopeTest.launch(start = CoroutineStart.LAZY) {
+            repeat(times = 5) {
+                delay(2000)
+                val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
+                coroutineLaunchContent += currentContent
+                Log.d(TAG, currentContent)
+                withContext(Dispatchers.Main) {
+                    tvContentLaunch.text = coroutineLaunchContent
+                }
+            }
+            Log.e(TAG, "协程执行结束")
+        }
+    }
+
     private fun initView() {
         tv1 = findViewById(R.id.tv_1)
         tv2 = findViewById(R.id.tv_2)
@@ -81,15 +132,34 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
         btnKTStudy = findViewById(R.id.btn_kt_study)
         btnCoroutineBlocking = findViewById(R.id.btn_coroutine_blocking)
-        btnCoroutineLaunch = findViewById(R.id.btn_coroutine_launch)
-        btnCoroutineLaunchCancel = findViewById(R.id.btn_coroutine_launch_cancel)
+        btnCoroutineInit = findViewById(R.id.btn_coroutine_init)
+        btnCoroutineStart = findViewById(R.id.btn_coroutine_start)
+        btnCoroutineCancel = findViewById(R.id.btn_coroutine_cancel)
+        btnCoroutineContextTest = findViewById(R.id.btn_coroutine_context_test)
+        btnCoroutineLaunchModeTest = findViewById(R.id.btn_coroutine_launch_mode_test)
+        btnCoroutineSuspendTest = findViewById(R.id.btn_coroutine_suspend_test)
+        btnCoroutineAsyncTest = findViewById(R.id.btn_coroutine_async_test)
+        btnCoroutineFinallyTest = findViewById(R.id.btn_coroutine_finally_test)
+        btnCoroutineTimeOutTest = findViewById(R.id.btn_coroutine_time_out_test)
+        btnCoroutineCombinedSuspendTest = findViewById(R.id.btn_coroutine_combined_suspend_test)
+        btnCoroutineChannelTest = findViewById(R.id.btn_coroutine_channel_test)
+
     }
 
     private fun initListener() {
         btnKTStudy.setOnClickListener(this)
         btnCoroutineBlocking.setOnClickListener(this)
-        btnCoroutineLaunch.setOnClickListener(this)
-        btnCoroutineLaunchCancel.setOnClickListener(this)
+        btnCoroutineInit.setOnClickListener(this)
+        btnCoroutineStart.setOnClickListener(this)
+        btnCoroutineCancel.setOnClickListener(this)
+        btnCoroutineContextTest.setOnClickListener(this)
+        btnCoroutineLaunchModeTest.setOnClickListener(this)
+        btnCoroutineSuspendTest.setOnClickListener(this)
+        btnCoroutineAsyncTest.setOnClickListener(this)
+        btnCoroutineFinallyTest.setOnClickListener(this)
+        btnCoroutineTimeOutTest.setOnClickListener(this)
+        btnCoroutineCombinedSuspendTest.setOnClickListener(this)
+        btnCoroutineChannelTest.setOnClickListener(this)
     }
 
     private fun initData() {
@@ -401,7 +471,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
 
         //repeat循环
-        repeat(times = 10){
+        repeat(times = 10) {
             print("$it ")
         }
         println()
@@ -540,11 +610,11 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
     }
 
     //apply函数的返回值是本身，在函数内部可以任意调用对象的属性或方法或给属性赋值等操作
-    private fun functionTest(){
+    private fun functionTest() {
         //let函数
         letTest(this)
 
-        val data:DataClassTest? = DataClassTest()
+        val data: DataClassTest? = DataClassTest()
         data?.apply {
             name = "Test Name"
             sex = "Test Sex"
@@ -558,7 +628,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         }
         data?.hello()
 
-        with(data){
+        with(data) {
             this?.name = "Test run Name"
             this?.sex = "Test run Sex"
             this?.age = 18
@@ -614,13 +684,13 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
         dataTest1.age = 27
         println("dataClassTest-dataTest1-set: $dataTest1")
 
-        val dataTest2 = DataClassTest(name = "SoMustYY",sex = "男",age = 28)
+        val dataTest2 = DataClassTest(name = "SoMustYY", sex = "男", age = 28)
         println("dataClassTest-dataTest2: $dataTest2")
         //copy
-        val newDataTest2 = dataTest2.copy(name = "Summer",)
+        val newDataTest2 = dataTest2.copy(name = "Summer")
         println("dataClassTest-newDataTest2: $newDataTest2")
         //componentN:解构声明
-        val(name,sex,age) = newDataTest2
+        val (name, sex, age) = newDataTest2
         println("dataClassTest-componentN-name: $name")
         println("dataClassTest-componentN-name: $sex")
         println("dataClassTest-componentN-name: $age")
@@ -655,7 +725,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
             repeat(times = 5) {
                 val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
                 coroutineBlockingContent += currentContent
-                Log.d(TAG,currentContent)
+                Log.d(TAG, currentContent)
                 //延迟1000ms
                 delay(1000)
             }
@@ -666,34 +736,377 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
     }
 
-    private fun coroutineLaunchTest(){
-        if(!::launchJobTest.isInitialized || !launchJobTest.isActive){
-            coroutineLaunchContent = ""
-            tvContentLaunch.text = coroutineLaunchContent
-            println("-----------coroutineLaunchTest-start-------------")
-            Log.e(TAG, "主线程id：${mainLooper.thread.id}")
-            launchJobTest = GlobalScope.launch {
-                repeat(times = 5){
-                    delay(2000)
-                    val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
-                    coroutineLaunchContent += currentContent
-                    Log.d(TAG,currentContent)
-                    withContext(Dispatchers.Main){
-                        tvContentLaunch.text = coroutineLaunchContent
-                    }
-                }
-                Log.e(TAG, "协程执行结束")
+    //suspend：挂起函数
+    private suspend fun coroutineLaunchTest() {
+        println("-----------coroutineLaunchTest-start-------------")
+        if (::jobTest.isInitialized) {
+            if (jobTest.isCancelled) {
+                coroutineLaunchContent = ""
+                tvContentLaunch.text = coroutineLaunchContent
+                Toast.makeText(this, "Job is canceled , need to reinitialize", Toast.LENGTH_SHORT)
+                    .show()
+            } else if (!jobTest.isActive) {
+                coroutineLaunchContent = ""
+                tvContentLaunch.text = coroutineLaunchContent
+
+                Log.e(TAG, "主线程id：${mainLooper.thread.id}")
+                jobTest.join()
+            } else {
+                Toast.makeText(this, "Job 正在执行", Toast.LENGTH_SHORT).show()
             }
         } else {
-            Toast.makeText(this,"Launch 正在执行",Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Job 未初始化", Toast.LENGTH_SHORT).show()
         }
     }
 
+    private fun coroutineContextTest() {
+        println("-----------coroutineContextTest-start-------------")
+        Log.e(TAG, "当前主线程-id：${mainLooper.thread.id}")
+        CoroutineScope(Dispatchers.Main).launch {
+            //主线程上运行一个协程,可以用来更新UI
+            println("coroutineContextTest-Dispatchers.Main ${Thread.currentThread().id}")
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            //在主线程之外执行磁盘或网络 I/O，在线程池中执行
+            println("coroutineContextTest-Dispatchers.IO ${Thread.currentThread().id}")
+        }
+        CoroutineScope(Dispatchers.Default).launch {
+            //执行 cpu 密集型的工作，在线程池中执行
+            println("coroutineContextTest-Dispatchers.Default ${Thread.currentThread().id}")
+        }
+        CoroutineScope(Dispatchers.Unconfined).launch {
+            //在调用的线程直接执行
+            println("coroutineContextTest-Dispatchers.Unconfined ${Thread.currentThread().id}")
+        }
 
-    override fun interfaceMethod(params: String) {
-        println("interfaceMethod $params")
+        //创建一个新的线程
+        val thread = newFixedThreadPoolContext(1, "SoMustYY")
+        CoroutineScope(thread).launch {
+            println("coroutineContextTest-newSingleThreadContext ${Thread.currentThread().id}")
+        }
+        thread.close()
+        println("-----------coroutineContextTest-end-------------")
     }
 
+    private suspend fun coroutineLaunchModeTest() {
+        println("-----------coroutineLaunchMode-start-------------")
+
+        // 立即执行协程体，随时可以取消
+        val jobDefault =
+            CoroutineScope(context = Dispatchers.Main).launch(start = CoroutineStart.DEFAULT) {
+                println("coroutineLaunchMode-DEFAULT-1111")
+            }
+        jobDefault.cancel()
+        println("coroutineLaunchMode-DEFAULT-2222")
+
+        // 立即执行协程体，但在开始运行协程体之前无法取消
+        val jobAtomic =
+            CoroutineScope(context = Dispatchers.Main).launch(start = CoroutineStart.ATOMIC) {
+                println("coroutineLaunchMode-ATOMIC-1111")
+            }
+        jobAtomic.cancel()
+        println("coroutineLaunchMode-ATOMIC-2222")
+
+
+        // 只有在用户需要的情况下运行
+        // 分离协程的创建和执行
+        val jobLazy =
+            CoroutineScope(context = Dispatchers.Main).launch(start = CoroutineStart.LAZY) {
+                println("coroutineLaunchMode-LAZY-1111")
+                delay(2000)
+            }
+        println("coroutineLaunchMode-LAZY-2222")
+//        jobLazy.start()
+        jobLazy.join()
+        println("coroutineLaunchMode-LAZY-3333")
+
+        //立即在当前线程执行协程体，直到第一个 suspend 调用
+        val jobUnDisPatched =
+            CoroutineScope(context = Dispatchers.Main).launch(start = CoroutineStart.UNDISPATCHED) {
+                println("coroutineLaunchMode-UNDISPATCHED-1111")
+                //delay 挂起 3s
+                delay(3000)
+                println("coroutineLaunchMode-UNDISPATCHED-2222")
+            }
+        println("coroutineLaunchMode-UNDISPATCHED-3333")
+        //join 要求等待协程体执行完
+        jobUnDisPatched.join()
+        println("coroutineLaunchMode-UNDISPATCHED-4444")
+
+        println("-----------coroutineLaunchMode-end-------------")
+    }
+
+    private fun coroutineAsyncTest() {
+        CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(context = Dispatchers.Default).launch {
+                val result1 = CoroutineScope(Dispatchers.Default).async {
+                    getResult1()
+                }
+
+                val result2 = CoroutineScope(Dispatchers.Default).async {
+                    getResult2()
+                }
+
+                val result = result1.await() + result2.await()
+                Log.e(TAG, "result = $result")
+            }
+        }
+    }
+
+    private suspend fun getResult1(): Int {
+        delay(2000)
+        return 1
+    }
+
+    private suspend fun getResult2(): Int {
+        delay(4000)
+        return 2
+    }
+
+    private fun coroutineSuspendTest() {
+        CoroutineScope(context = Dispatchers.Main).launch {
+            val token = getToken()
+            val userInfo = getUserInfo(token)
+            setUserInfo(userInfo)
+        }
+    }
+
+    private suspend fun getToken(): String {
+        delay(2000)
+        return "SoMustYY"
+    }
+
+    private suspend fun getUserInfo(token: String): String {
+        delay(1000)
+        return "$token _test1_test2"
+    }
+
+    private fun setUserInfo(userInfo: String) {
+        println("userInfo: $userInfo")
+    }
+
+    private fun coroutineFinallyTest() {
+        println("-----------coroutineFinallyTest-start-------------")
+
+        //在 finally 中释放资源
+        runBlocking {
+            val job = launch {
+                try {
+                    repeat(100) { i ->
+                        //调用ensureActive，非活跃会抛出取消的异常
+                        ensureActive()
+                        println("job1: I'm sleeping $i ...")
+                        delay(500)
+                    }
+                } catch (e: Exception) {
+                    println("job1: Exception $e")
+                } finally {
+                    println("job1: I'm running finally")
+                    delay(1000L)
+                    //cancelAndJoin后调用
+                    println("job1: I'm running finally-delay")
+                }
+            }
+            //延迟5s后执行 cancelAndJoin
+            delay(5000L)
+            println("main1: I'm tired of waiting!")
+            job.cancelAndJoin()
+            println("main1: Now I can quit.")
+        }
+
+        //运行不能取消的代码块
+        runBlocking {
+            val job = launch {
+                var i = 0
+                try {
+                    while (isActive) {
+                        println("job2: I'm sleeping $i ...")
+                        delay(500L)
+                        i++
+                    }
+                } catch (e: CancellationException) {
+                    println("job2: Exception $e")
+                } finally {
+                    withContext(NonCancellable) {
+                        println("job2: I'm running finally")
+                        delay(1000L)
+                        println("job2: And I've just delayed for 1 sec because I'm non-cancellable")
+                    }
+                }
+            }
+            //延迟2s后执行 cancelAndJoin
+            delay(2000)
+            println("main2: I'm tired of waiting!")
+            job.cancelAndJoin()
+            println("main2: Now I can quit.")
+        }
+        println("-----------coroutineFinallyTest-end-------------")
+    }
+
+
+    private fun coroutineTimeOutTest() {
+        println("-----------coroutineTimeOutTest-start-------------")
+        runBlocking {
+            //使用 withTimeoutOrNull 后 不再抛出异常，而 withTimeoutOrNull 通过返回 null 来进行超时操作，从而替代抛出一个异常
+            val result = withTimeoutOrNull(1500L) {
+                repeat(1000) { i ->
+                    println("I'm sleeping $i ...")
+                    delay(500L)
+                }
+            }
+            println("Result is $result")
+        }
+
+
+        //变量中存储对资源的引用，资源不泄露
+        runBlocking {
+            repeat(1) {
+                launch {
+                    var resource: Resource? = null
+                    try {
+                        withTimeout(60) {
+                            delay(50)
+                            resource = Resource()
+                            println("acquired-init: $acquired")
+                        }
+                    } catch (e: Exception) {
+                        println("Exception: $e")
+                    } finally {
+                        println("resource?.close-1111")
+                        resource?.close()
+                        println("resource?.close-2222")
+                    }
+                }
+            }
+            println("acquired-end: $acquired")
+        }
+        println("-----------coroutineTimeOutTest-end-------------")
+    }
+
+    private suspend fun coroutineCombinedSuspendTest() {
+        println("-----------coroutineCombinedSuspendTest-start-------------")
+        //默认顺序调用
+        val time1 = measureTimeMillis {
+            val one = doSomeThingOne()
+            val two = doSomethingTwo()
+            val result = one + two
+            println("result1 $result")
+        }
+        println("Completed1 in $time1 ms")
+
+        //并发调用
+        val time2 = measureTimeMillis {
+            val one = CoroutineScope(Dispatchers.IO).async {
+                doSomeThingOne()
+            }
+            val two = CoroutineScope(Dispatchers.IO).async {
+                doSomethingTwo()
+            }
+            val result = one.await() + two.await()
+            println("result2 $result")
+        }
+        println("Completed2 in $time2 ms")
+
+
+        val time3 = measureTimeMillis {
+            val one = CoroutineScope(Dispatchers.Unconfined).async(start = CoroutineStart.LAZY) {
+                doSomeThingOne()
+            }
+            val two = CoroutineScope(Dispatchers.IO).async(start = CoroutineStart.LAZY) {
+                doSomethingTwo()
+            }
+            //如果我们只调用 await，而没有在单独的协程中调用 start，这将会导致 顺序执行
+            one.start()
+            two.start()
+            val result3 = one.await() + two.await()
+            println("result3 $result3")
+        }
+        println("Completed3 in $time3 ms")
+
+
+        //结构化并发能为：
+        //1. 消任务，当任务不再被需要的时候；
+        //2. 跟踪任务，当任务正在运行的时候；
+        //3. 报错，当协程失败的时候；
+        //结构化并发的保证：
+        //1. 当一个 scope 取消的时候，它里面所有的协程都会被取消；
+        //2. 当一个 suspend 方法 return 的时候，它所有的工作都已完成；
+        //3. 当一个协程出错的时候，他的调用者或 scope 会收到通知；
+
+        println("-----------coroutineCombinedSuspendTest-end-------------")
+    }
+
+    private suspend fun doSomeThingOne(): Int {
+        delay(1000L)
+        return 15
+    }
+
+    private suspend fun doSomethingTwo(): Int {
+        delay(1500L)
+        return 25
+    }
+
+    private fun coroutineChannelTest() {
+        println("-----------coroutineChannelTest-start-------------")
+        //通道：channel send receive
+        runBlocking {
+            val channel = Channel<Int>()
+            launch {
+                for (i in 1..5) {
+                    channel.send(i * i)
+                }
+            }
+            repeat(5) {
+                println("receive: ${channel.receive()}")
+            }
+            println("Done!")
+        }
+
+        runBlocking {
+            delay(1000)
+        }
+
+        //关闭与迭代通道
+        runBlocking {
+            val channel = Channel<Int>()
+            launch {
+                for(i in 1..8){
+                    channel.send(i * i * 2)
+                }
+                channel.close()
+            }
+
+            for(j in channel){
+                println("channel: $j")
+            }
+            println("Done!")
+        }
+
+        runBlocking {
+            delay(1000)
+        }
+
+        //构建通道生产者
+        runBlocking {
+            val squares = produceSquares()
+            //迭代器
+            squares.consumeEach {
+                println("square: $it")
+            }
+            println("Done!")
+        }
+
+
+
+        println("-----------coroutineChannelTest-end-------------")
+    }
+
+    //produce: 便捷的协程构建器
+    private fun CoroutineScope.produceSquares(): ReceiveChannel<Int> = produce{
+        for(i in 2..10){
+            send(i * i)
+        }
+    }
 
     override fun onClick(view: View?) {
         when (view?.id) {
@@ -759,18 +1172,60 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
                 //协程-阻塞式
                 coroutineBlockingTest()
             }
-            R.id.btn_coroutine_launch -> {
-                //协程-非阻塞式
-                coroutineLaunchTest()
+            R.id.btn_coroutine_init -> {
+                initJob()
             }
-            R.id.btn_coroutine_launch_cancel -> {
-
-                if(::launchJobTest.isInitialized){
-                    launchJobTest.cancel()
+            R.id.btn_coroutine_start -> {
+                CoroutineScope(context = Dispatchers.Main).launch {
+                    //协程-非阻塞式
+                    coroutineLaunchTest()
+                }
+            }
+            R.id.btn_coroutine_cancel -> {
+                if (::jobTest.isInitialized) {
+                    println("-----------job-cancel-------------")
+                    jobTest.cancel()
                 }
             }
 
-            //协程-阻塞式
+            R.id.btn_coroutine_context_test -> {
+                //上下文
+                coroutineContextTest()
+            }
+            R.id.btn_coroutine_launch_mode_test -> {
+                CoroutineScope(context = Dispatchers.Main).launch {
+                    //启动模式
+                    coroutineLaunchModeTest()
+                }
+            }
+
+            R.id.btn_coroutine_suspend_test -> {
+                //suspend 挂起函数
+                coroutineSuspendTest()
+            }
+
+            R.id.btn_coroutine_async_test -> {
+                //async
+                coroutineAsyncTest()
+            }
+            R.id.btn_coroutine_finally_test -> {
+                //finally
+                coroutineFinallyTest()
+            }
+            R.id.btn_coroutine_time_out_test -> {
+                //time out
+                coroutineTimeOutTest()
+            }
+
+            R.id.btn_coroutine_combined_suspend_test -> {
+                //组合挂起函数
+                CoroutineScope(Dispatchers.Main).launch {
+                    coroutineCombinedSuspendTest()
+                }
+            }
+            R.id.btn_coroutine_channel_test -> {
+                coroutineChannelTest()
+            }
             else -> {
 
             }
@@ -787,5 +1242,9 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface, Generi
 
     override fun write() {
         println("StudyInterface-write")
+    }
+
+    override fun interfaceMethod(params: String) {
+        println("interfaceMethod $params")
     }
 }

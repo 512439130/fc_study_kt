@@ -4,8 +4,19 @@
 
     <string name="btn_text_coroutine_title">Coroutine Study</string>
     <string name="btn_text_coroutine_blocking">Blocking</string>
-    <string name="btn_text_coroutine_blocking_cancel"> cancel</string>
+    <string name="btn_text_coroutine_blocking_cancel">cancel</string>
 
-    <string name="btn_text_coroutine_launch">Launch</string>
-    <string name="btn_text_coroutine_launch_cancel">cancel</string>
+    <string name="btn_text_coroutine_init">init</string>
+    <string name="btn_text_coroutine_start">launch</string>
+    <string name="btn_text_coroutine_cancel">cancel</string>
+    <string name="btn_test_context">context</string>
+    <string name="btn_test_launch_mode">launchMode</string>
+    <string name="btn_test_suspend">suspend</string>
+    <string name="btn_test_async">async</string>
+    <string name="btn_test_finally">finally</string>
+    <string name="btn_test_time_out">time out</string>
+    <string name="btn_test_combined">combined suspend</string>
+    <string name="btn_test_channel">channel</string>
+
+
 </resources>
