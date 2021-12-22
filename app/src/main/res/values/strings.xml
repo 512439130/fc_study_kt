@@ -17,6 +17,7 @@
     <string name="btn_test_time_out">time out</string>
     <string name="btn_test_combined">combined suspend</string>
     <string name="btn_test_channel">channel</string>
+    <string name="btn_test_async_stream">Async Stream</string>
 
 
 </resources>

@@ -2,7 +2,6 @@ package com.fc.study.kt
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -19,10 +18,7 @@ import com.fc.study.stat.SingleClassTest
 import com.fc.study.stat.StaticClassTest
 import com.fc.study.stat.topTest
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.channels.*
 import java.util.*
 import kotlin.system.measureTimeMillis
 
@@ -72,6 +68,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
     private lateinit var btnCoroutineTimeOutTest: Button
     private lateinit var btnCoroutineCombinedSuspendTest: Button
     private lateinit var btnCoroutineChannelTest: Button
+    private lateinit var btnCoroutineAsyncStreamTest: Button
 
     //lateinit：延迟初始化
     private lateinit var testLateInit: String
@@ -143,6 +140,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         btnCoroutineTimeOutTest = findViewById(R.id.btn_coroutine_time_out_test)
         btnCoroutineCombinedSuspendTest = findViewById(R.id.btn_coroutine_combined_suspend_test)
         btnCoroutineChannelTest = findViewById(R.id.btn_coroutine_channel_test)
+        btnCoroutineAsyncStreamTest = findViewById(R.id.btn_coroutine_async_stream_test)
 
     }
 
@@ -160,6 +158,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         btnCoroutineTimeOutTest.setOnClickListener(this)
         btnCoroutineCombinedSuspendTest.setOnClickListener(this)
         btnCoroutineChannelTest.setOnClickListener(this)
+        btnCoroutineAsyncStreamTest.setOnClickListener(this)
     }
 
     private fun initData() {
@@ -759,6 +758,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         }
     }
 
+    @ObsoleteCoroutinesApi
     private fun coroutineContextTest() {
         println("-----------coroutineContextTest-start-------------")
         Log.e(TAG, "当前主线程-id：${mainLooper.thread.id}")
@@ -788,6 +788,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         println("-----------coroutineContextTest-end-------------")
     }
 
+    @ExperimentalCoroutinesApi
     private suspend fun coroutineLaunchModeTest() {
         println("-----------coroutineLaunchMode-start-------------")
 
@@ -1046,6 +1047,8 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         return 25
     }
 
+    @ExperimentalCoroutinesApi
+    @ObsoleteCoroutinesApi
     private fun coroutineChannelTest() {
         println("-----------coroutineChannelTest-start-------------")
         //通道：channel send receive
@@ -1070,13 +1073,13 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         runBlocking {
             val channel = Channel<Int>()
             launch {
-                for(i in 1..8){
+                for (i in 1..8) {
                     channel.send(i * i * 2)
                 }
                 channel.close()
             }
 
-            for(j in channel){
+            for (j in channel) {
                 println("channel: $j")
             }
             println("Done!")
@@ -1096,18 +1099,170 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
             println("Done!")
         }
 
+        //管道
 
+        runBlocking {
+            val numbers = produceNumber()
+            val squares = square(numbers)
+            repeat(5) {
+                println(squares.receive())
+            }
+            println("Done!")
+            // 取消所有子协程来让主协程结束，释放资源
+            coroutineContext.cancelChildren()
+        }
+
+        println("-----扇出-----")
+        //扇出：多个协程也许会接收相同的管道
+        runBlocking {
+            val producer = produceNumbers()
+            repeat(5) {
+                launchProcessor(it, producer)
+            }
+            delay(900)
+            // 取消协程生产者从而将它们全部杀死
+            producer.cancel()
+        }
+        println("-----扇入-----")
+        //扇入：多个协程可以发送到同一个通道
+        runBlocking {
+            val channel = Channel<String>()
+            //开启多个子协程发送到同一个通道，分布式工作
+            launch {
+                sendString(channel, "yy", 200L)
+            }
+            launch {
+                sendString(channel, "test", 200L)
+            }
+            launch {
+                sendString(channel, "zh", 500L)
+            }
+
+            repeat(10) {
+                println(channel.receive())
+            }
+
+            //取消所有子协程，使主协程结束
+            coroutineContext.cancelChildren()
+        }
+
+
+        //带缓冲的通道
+        runBlocking {
+            val channel = Channel<Int>(capacity = 4) //启动带缓冲的通道
+            //启动发送者协程
+            val sender = launch {
+                repeat(10) {
+                    println("Test Sending $it")
+                    channel.send(it) //将在缓冲区被占满时挂起
+                }
+            }
+            delay(1000)
+            //取消发送者协程
+            sender.cancel()
+
+        }
+        //通道的公平性，先进先出（FIFO）
+
+
+        println("-----计时器通道-----")
+        //计时器通道
+        runBlocking {
+            //创建计时器通道
+            val tickerChannel = ticker(delayMillis = 100, initialDelayMillis = 0)
+            var nextElement = withTimeoutOrNull(1) {
+                tickerChannel.receive()
+            }
+            println("Initial element is available immediately: $nextElement")
+
+            nextElement = withTimeoutOrNull(50) {
+                tickerChannel.receive()
+            }
+
+            println("Next element is not ready in 50 ms: $nextElement")
+
+            nextElement = withTimeoutOrNull(49) {
+                tickerChannel.receive()
+            }
+            println("Next element is ready in 100 ms: $nextElement")
+
+            //模拟大量消费延迟
+            println("Consumer pauses for 150m")
+            delay(150)
+
+            // 下一个元素立即可用
+            nextElement = withTimeoutOrNull(1) {
+                tickerChannel.receive()
+            }
+            println("Next element is available immediately after large consumer delay: $nextElement")
+            // 请注意，`receive` 调用之间的暂停被考虑在内，下一个元素的到达速度更快
+            nextElement = withTimeoutOrNull(49) {
+                tickerChannel.receive()
+            }
+            println("Next element is ready in 50ms after consumer pause in 150ms: $nextElement")
+
+            tickerChannel.cancel() // 表明不再需要更多的元素
+        }
 
         println("-----------coroutineChannelTest-end-------------")
     }
 
-    //produce: 便捷的协程构建器
-    private fun CoroutineScope.produceSquares(): ReceiveChannel<Int> = produce{
-        for(i in 2..10){
+
+    private fun coroutineAsyncStreamTest() {
+        TODO("Not yet implemented")
+    }
+
+    @ExperimentalCoroutinesApi
+    private fun CoroutineScope.produceNumbers() = produce<Int> {
+        var i = 1
+        while (true) {
+            send(i++)
+            delay(100)
+        }
+    }
+
+    private fun CoroutineScope.launchProcessor(id: Int, channel: ReceiveChannel<Int>) = launch {
+        for (msg in channel) {
+            println("Processor #$id received $msg")
+        }
+    }
+
+    private suspend fun sendString(channel: SendChannel<String>, content: String, time: Long) {
+        while (true) {
+            delay(time)
+            channel.send(content)
+        }
+    }
+
+
+    //创建协程的所有函数都被定义为 CoroutineScope 的扩展，因此我们可以依赖结构化并发来确保应用程序中没有延迟的全局协程
+    @ExperimentalCoroutinesApi
+    private fun CoroutineScope.produceNumber() = produce<Int> {
+        var i = 5
+        while (true) {
+            send(i++)
+        }
+    }
+
+    //创建协程的所有函数都被定义为 CoroutineScope 的扩展，因此我们可以依赖结构化并发来确保应用程序中没有延迟的全局协程
+    @ExperimentalCoroutinesApi
+    private fun CoroutineScope.square(numbers: ReceiveChannel<Int>): ReceiveChannel<Int> = produce {
+        for (i in numbers) {
             send(i * i)
         }
     }
 
+
+    //produce: 便捷的协程构建器
+    @ExperimentalCoroutinesApi
+    private fun CoroutineScope.produceSquares(): ReceiveChannel<Int> = produce {
+        for (i in 2..10) {
+            send(i * i)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @ObsoleteCoroutinesApi
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.btn_kt_study -> {
@@ -1225,6 +1380,9 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
             }
             R.id.btn_coroutine_channel_test -> {
                 coroutineChannelTest()
+            }
+            R.id.btn_coroutine_async_stream_test -> {
+                coroutineAsyncStreamTest()
             }
             else -> {
 
