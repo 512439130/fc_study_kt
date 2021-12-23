@@ -17,7 +17,7 @@ import com.fc.study.kt.TestClassKotlin
 
 class MainActivity : BaseActivity(), View.OnClickListener, ActivityInterface {
     private lateinit var btnLogin: Button
-    private lateinit var etUsername: EditText
+    private lateinit var etName: EditText
     private lateinit var etSex: EditText
     private lateinit var etAge: EditText
 
@@ -36,11 +36,11 @@ class MainActivity : BaseActivity(), View.OnClickListener, ActivityInterface {
     private fun initView() {
         btnLogin = findViewById(R.id.btn_login)
         btnLogin.setOnClickListener(this)
-        etUsername = findViewById(R.id.et_username)
+        etName = findViewById(R.id.et_name)
         etSex = findViewById(R.id.et_sex)
         etAge = findViewById(R.id.et_age)
 
-        etUsername.setText("杨阳")
+        etName.setText("杨阳")
         etSex.text = Editable.Factory.getInstance().newEditable("男")
         etAge.text = Editable.Factory.getInstance().newEditable("27")
     }
@@ -49,7 +49,7 @@ class MainActivity : BaseActivity(), View.OnClickListener, ActivityInterface {
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.btn_login -> {
-                username = etUsername.text.toString()
+                username = etName.text.toString()
                 sex = etSex.text.toString()
                 age = etAge.text.toString()
                 login(username, sex, age)

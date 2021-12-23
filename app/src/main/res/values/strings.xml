@@ -18,6 +18,10 @@
     <string name="btn_test_combined">combined suspend</string>
     <string name="btn_test_channel">channel</string>
     <string name="btn_test_async_stream">Async Stream</string>
+    <string name="tv_title_kotlin">Kotlin 学习</string>
+    <string name="et_hint_name">请输入姓名</string>
+    <string name="et_hint_sex">请输入性别</string>
+    <string name="et_hint_age">请输入年龄</string>
 
 
 </resources>

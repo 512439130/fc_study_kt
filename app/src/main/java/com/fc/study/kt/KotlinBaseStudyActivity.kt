@@ -19,8 +19,11 @@ import com.fc.study.stat.StaticClassTest
 import com.fc.study.stat.topTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
+
 import java.util.*
 import kotlin.system.measureTimeMillis
+
+import kotlinx.coroutines.flow.*
 
 private const val TAG: String = "TestClassKotlin"
 
@@ -107,8 +110,8 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
         //GlobalScope.launch有可能导致无法预料的内存泄漏
         scopeTest = CoroutineScope(context = Dispatchers.Main)
         jobTest = scopeTest.launch(start = CoroutineStart.LAZY) {
-            repeat(times = 5) {
-                delay(2000)
+            repeat(times = 10) {
+                delay(500)
                 val currentContent = "协程执行循环变量$it 线程id：${Thread.currentThread().id}\n"
                 coroutineLaunchContent += currentContent
                 Log.d(TAG, currentContent)
@@ -1209,7 +1212,302 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
 
 
     private fun coroutineAsyncStreamTest() {
-        TODO("Not yet implemented")
+        //Flow
+        // emit：发送数据
+        // collect：收集数据
+
+        println("-----------coroutineAsyncStreamTest-start-------------")
+//        asyncStreamTest1()
+//        asyncStreamTest2()
+//        asyncStreamTest3()
+//        asyncStreamTest4()
+//        asyncStreamTest5()
+//        flowColdTest()
+//        flowConstructorTest()
+
+        flowOperatorRequestTest()
+        println("-----------coroutineAsyncStreamTest-end-------------")
+    }
+
+    private fun flowOperatorRequestTest() = CoroutineScope(Dispatchers.Main).launch {
+        println("-----------flowOperatorTest 过滤流操作符-------------")
+
+        //过滤流操作符 map filter
+        val list = listOf("login", "register", "getUserInfo",)
+        list.asFlow()
+            .filter { //过滤 return true: 继续，return false 停止
+                checkValue(it)
+            }
+            .map { //包装结果
+                request -> performRequest(request)
+            }
+            .collect { //收集
+                response -> println(response)
+            }
+
+        println("-----------flowOperatorTest 转换操作符-------------")
+
+        //转换操作符 transform
+        list.asFlow()
+            .transform { request ->
+                //transform：拦截收集上游数据并转发，具备向下游发送数据的能力
+                //多次调用emit发送数据，emit发送数据，collect取数据
+                emit("Making request $request")
+                emit(666)
+                emit(false)
+                emit(performRequest(request))
+            }
+            .collect { response ->
+                println("collect $response")
+            }
+
+        println("-----------flowOperatorTest 限长操作符-------------")
+        //限长操作符 take
+        numbers()
+            .take(2) //只获取2个
+            .collect { value ->
+                println("collect_take $value")
+            }
+
+
+        println("-----------flowOperatorTest 末端流操作符-------------")
+        //末端流操作符
+        //收集数据）：collect
+        //转化为各种集合）：toList toSet
+        //获取第一个值）：first
+        //确保流发送单个：single
+        //将流规约到单个值：reduce，fold
+
+        val listResult = (1..5).asFlow()
+            .map {
+                it * it
+            }
+            .toList()
+        println("listResult $listResult")
+
+        try {
+            val single = (1..5).asFlow()
+                .filter {
+                    (it % 5 == 0)
+                }
+                .map {
+                    it * it
+                }
+                .single()
+            println("single $single")
+        } catch (e: Exception) {
+            println("e $e")
+        } finally {
+            println("single-finally")
+        }
+
+        val first = (1..5).asFlow()
+            .map {
+                it * it
+            }
+            .first()
+        println("first $first")
+
+        val sum = (1..5).asFlow()
+            .map {
+                it * it
+            }
+            .reduce { value1, value2 ->
+                (value1 + value2)
+            }
+        println("sum $sum")
+
+
+        println("-----------flowOperatorTest 流上下文-------------")
+        //Flow 上下文
+        simple6().collect { value ->
+            logThread("Collected $value")
+        }
+
+        simple7().collect { value ->
+            logThread("flowOn-Collected $value")
+        }
+    }
+
+
+    private fun numbers(): Flow<Int> = flow {
+        try {
+            println("emit start ...")
+            emit(1)
+            emit(6)
+            println("This line will not execute")
+            emit(8)
+            emit(22)
+        } finally {
+            println("Finally in numbers")
+        }
+    }
+
+
+    private fun checkValue(value: String): Boolean {
+//        val result = when {
+//            value.contains("login") -> true
+//            value.contains("register") -> true
+//            else -> false
+//        }
+        val result = when(value) {
+            "login" -> true
+            "register" -> true
+            else -> false
+        }
+        println("checkValue $value $result")
+        return result
+    }
+
+    private suspend fun performRequest(request: String): String {
+        println("performRequest $request")
+        delay(1000) //模拟长时间的异步任务
+        return "response $request"
+    }
+
+    private fun flowConstructorTest() = runBlocking {
+        //Flow 构造器
+        println("-----------flowConstructorTest-------------")
+        val list = listOf<Int>(1, 2, 3, 4, 5)
+
+        val flow1 = list.asFlow()
+        flow1.collect {
+            value -> println("flow1_collect $value")
+        }
+        val flow2 = flowOf(5, 6, 7, 8, 9)
+        flow2.collect {
+            value -> println("flow2_collect $value")
+        }
+    }
+
+    private fun simple1(): List<Int> = listOf(1, 2, 3, 4, 5)
+
+    private fun simple2(): Sequence<Int> = sequence {
+        for (i in 1..5) {
+            //消耗 CPU 资源的阻塞代码计算数字
+            Thread.sleep(100)
+            yield(i)
+        }
+    }
+
+    private suspend fun simple3(): List<Int> {
+        println("await 1000s start......")
+        //模拟异步的操作
+        delay(1000)
+        return listOf(1, 2, 3, 4, 5)
+    }
+
+    private fun simple4(): Flow<String> = flow {
+        println("Flow simple4 started")
+        for (i in 1..5) {
+            delay(1000) //模拟延迟操作
+            emit("YY_$i") // 发送下一个值
+        }
+    }
+
+    private fun simple5(): Flow<Int> = flow {
+        for (i in 1..5){
+            delay(150)
+            println("Emitting $i")
+            emit(i)
+        }
+    }
+
+    private fun logThread(msg: String) {
+        println("[${Thread.currentThread().name}] $msg")
+    }
+
+    private fun simple6(): Flow<Int> = flow {
+        logThread("Started simple flow")
+        for (i in 1..5) {
+            emit(i)
+        }
+    }
+
+    private fun simple7(): Flow<Int> = flow {
+        //异常：java.lang.IllegalStateException: Flow invariant is violated
+        //flow 禁止使用 withContext
+//        withContext(Dispatchers.Default) {
+//            for (i in 1..5) {
+//                Thread.sleep(200)
+//                emit(i)
+//            }
+//        }
+        for (i in 1..5) {
+            Thread.sleep(200)
+            logThread("flowOn-Emitting $i")
+            emit(i)
+        }
+    }.flowOn(Dispatchers.Default)
+
+    private fun asyncStreamTest1() {
+        println("-------------------asyncStreamTest1------------------")
+        simple1().forEach { value ->
+            println("asyncStreamTest1 $value")
+        }
+    }
+
+    private fun asyncStreamTest2() {
+        println("-------------------asyncStreamTest2------------------")
+        simple2().forEach { value ->
+            println("asyncStreamTest2 $value")
+        }
+    }
+
+    private fun asyncStreamTest3() {
+        println("-------------------asyncStreamTest3------------------")
+        runBlocking {
+            simple3().forEach { value ->
+                println("asyncStreamTest3 $value")
+            }
+        }
+    }
+
+    //非阻塞协程作用域
+    private fun asyncStreamTest4() = CoroutineScope(Dispatchers.Main).launch {
+        println("-------------------asyncStreamTest4------------------")
+        //开启一个子协程
+        println("delay 2000s ...")
+        //延迟不阻塞线程
+        delay(2000)
+//        println("Thread.sleep 2000s asyncStreamTest4 ...")
+        //延迟阻塞线程
+//        Thread.sleep(5000)
+        launch {
+            for (i in 1..5) {
+                println("asyncStreamTest4 $i")
+                delay(1000)
+            }
+        }
+        //收集这个流
+        simple4().collect { value ->
+            println("simple4 $value")
+        }
+    }
+
+    private fun flowColdTest() = runBlocking {
+        println("-----------flowTest-end-------------")
+        println("Calling simple function...")
+        val flow1 = simple4()
+        println("Calling collect...")
+        flow1.collect { value ->
+            println("flow1 $value")
+        }
+        println("Calling collect again...")
+        flow1.collect { value ->
+            println("flow1 $value")
+        }
+    }
+
+    private fun asyncStreamTest5() = runBlocking {
+        println("-------------------asyncStreamTest5------------------")
+        //超时的情况下取消并停止执行代码块
+        withTimeoutOrNull(350){
+            simple5().collect {
+                value -> println("simple5 $value")
+            }
+        }
+        println("Done")
     }
 
     @ExperimentalCoroutinesApi
@@ -1228,12 +1526,12 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
     }
 
     private suspend fun sendString(channel: SendChannel<String>, content: String, time: Long) {
+        println("sendString...... $content")
         while (true) {
             delay(time)
             channel.send(content)
         }
     }
-
 
     //创建协程的所有函数都被定义为 CoroutineScope 的扩展，因此我们可以依赖结构化并发来确保应用程序中没有延迟的全局协程
     @ExperimentalCoroutinesApi
@@ -1382,6 +1680,7 @@ class TestClassKotlin : Activity(), View.OnClickListener, StudyInterface,
                 coroutineChannelTest()
             }
             R.id.btn_coroutine_async_stream_test -> {
+                //Flow
                 coroutineAsyncStreamTest()
             }
             else -> {
