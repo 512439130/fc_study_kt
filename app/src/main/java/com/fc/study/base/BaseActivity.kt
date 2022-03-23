@@ -4,15 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.fc.study.kt.databinding.ActivityKotlinBaseStudyBinding
 
 abstract class BaseActivity: AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(getLayoutId())
         init()
     }
-
-    abstract fun getLayoutId(): Int
 
     abstract fun init()
 

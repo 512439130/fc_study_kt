@@ -1,192 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <data>
+        <variable
+            name="name"
+            type="String" />
+        <variable
+            name="sex"
+            type="String" />
+        <variable
+            name="age"
+            type="String" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+        <variable
+            name="user"
+            type="com.fc.study.data.User" />
+
+    </data>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-        <TextView
-            android:id="@+id/tv_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:textColor="@color/color_black"
-            android:textSize="18sp"/>
-        <TextView
-            android:id="@+id/tv_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/tv_1"
-            app:layout_constraintTop_toBottomOf="@id/tv_1"
-            app:layout_constraintRight_toRightOf="@+id/tv_1"
-            android:textColor="@color/color_black"
-            android:textSize="18sp"/>
-        <TextView
-            android:id="@+id/tv_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/tv_2"
-            app:layout_constraintTop_toBottomOf="@id/tv_2"
-            app:layout_constraintRight_toRightOf="@+id/tv_2"
-            android:textColor="@color/color_black"
-            android:textSize="18sp"/>
-
-        <Button
-            android:id="@+id/btn_kt_study"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_3"
-            android:layout_marginTop="20dp"
-            android:text="@string/btn_text_kt_study_test"/>
-
-        <TextView
-            android:id="@+id/tv_coroutine_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="@id/btn_kt_study"
-            app:layout_constraintRight_toRightOf="@id/btn_kt_study"
-            app:layout_constraintTop_toBottomOf="@id/btn_kt_study"
-            android:text="@string/btn_text_coroutine_title"
-            android:layout_marginTop="20dp"
-
-            android:textSize="24sp"/>
-
-        <Button
-            android:id="@+id/btn_coroutine_blocking"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginTop="20dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_coroutine_title"
-            android:text="@string/btn_text_coroutine_blocking"/>
+        android:layout_height="match_parent">
 
 
+        <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <TextView
-            android:id="@+id/tv_content_blocking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_blocking"
-            android:textColor="@color/color_black"
-            android:textSize="14sp"/>
+            <TextView
+                android:id="@+id/tv_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:textColor="@color/color_black"
+                android:textSize="18sp"
+                android:text="@{user.name}"/>
 
-        <Button
-            android:id="@+id/btn_coroutine_init"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
-            android:text="@string/btn_text_coroutine_init"/>
-        <Button
-            android:id="@+id/btn_coroutine_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_init"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
-            android:text="@string/btn_text_coroutine_start"/>
+            <TextView
+                android:id="@+id/tv_sex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="@id/tv_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_name"
+                app:layout_constraintRight_toRightOf="@+id/tv_name"
+                android:textColor="@color/color_black"
+                android:textSize="18sp"
+                android:text="@{user.sex}"/>
 
-        <Button
-            android:id="@+id/btn_coroutine_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_start"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
-            android:text="@string/btn_text_coroutine_cancel"/>
+            <TextView
+                android:id="@+id/tv_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="@id/tv_sex"
+                app:layout_constraintTop_toBottomOf="@id/tv_sex"
+                app:layout_constraintRight_toRightOf="@+id/tv_sex"
+                android:textColor="@color/color_black"
+                android:textSize="18sp"
+                android:text="@{user.age}"/>
 
-        <TextView
-            android:id="@+id/tv_content_launch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingVertical="20dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_init"
-            android:textColor="@color/color_black"
-            android:textSize="14sp"/>
+            <Button
+                android:id="@+id/btn_kt_study"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_age"
+                android:layout_marginTop="20dp"
+                android:text="@string/btn_text_kt_study_test" />
 
-        <Button
-            android:id="@+id/btn_coroutine_context_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_launch"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:text="@string/btn_test_context"/>
-        <Button
-            android:id="@+id/btn_coroutine_launch_mode_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_test_launch_mode"
-            android:layout_marginStart="10dp"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_context_test"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_launch"/>
-        <Button
-            android:id="@+id/btn_coroutine_suspend_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_test_suspend"
-            android:layout_marginStart="10dp"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_launch_mode_test"
-            app:layout_constraintTop_toBottomOf="@id/tv_content_launch"/>
+            <TextView
+                android:id="@+id/tv_coroutine_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="@id/btn_kt_study"
+                app:layout_constraintRight_toRightOf="@id/btn_kt_study"
+                app:layout_constraintTop_toBottomOf="@id/btn_kt_study"
+                android:text="@string/btn_text_coroutine_title"
+                android:layout_marginTop="20dp"
 
-        <Button
-            android:id="@+id/btn_coroutine_async_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:text="@string/btn_test_async"/>
+                android:textSize="24sp" />
 
-        <Button
-            android:id="@+id/btn_coroutine_finally_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_async_test"
-            android:text="@string/btn_test_finally"/>
-
-        <Button
-            android:id="@+id/btn_coroutine_time_out_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_finally_test"
-            android:text="@string/btn_test_time_out"/>
-
-        <Button
-            android:id="@+id/btn_coroutine_combined_suspend_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_test_combined"
-
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_async_test"/>
-        <Button
-            android:id="@+id/btn_coroutine_channel_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_test_channel"
-            android:layout_marginStart="10dp"
-            app:layout_constraintLeft_toRightOf="@id/btn_coroutine_combined_suspend_test"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_async_test"/>
-        <Button
-            android:id="@+id/btn_coroutine_async_stream_test"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_test_async_stream"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_coroutine_combined_suspend_test"/>
+            <Button
+                android:id="@+id/btn_coroutine_blocking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="20dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_coroutine_title"
+                android:text="@string/btn_text_coroutine_blocking" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/tv_content_blocking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_blocking"
+                android:textColor="@color/color_black"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_coroutine_init"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
+                android:text="@string/btn_text_coroutine_init" />
+
+            <Button
+                android:id="@+id/btn_coroutine_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_init"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
+                android:text="@string/btn_text_coroutine_start" />
+
+            <Button
+                android:id="@+id/btn_coroutine_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_start"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_blocking"
+                android:text="@string/btn_text_coroutine_cancel" />
+
+            <TextView
+                android:id="@+id/tv_content_launch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="20dp"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_init"
+                android:textColor="@color/color_black"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_coroutine_context_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_launch"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:text="@string/btn_test_context" />
+
+            <Button
+                android:id="@+id/btn_coroutine_launch_mode_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_test_launch_mode"
+                android:layout_marginStart="10dp"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_context_test"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_launch" />
+
+            <Button
+                android:id="@+id/btn_coroutine_suspend_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_test_suspend"
+                android:layout_marginStart="10dp"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_launch_mode_test"
+                app:layout_constraintTop_toBottomOf="@id/tv_content_launch" />
+
+            <Button
+                android:id="@+id/btn_coroutine_async_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:text="@string/btn_test_async" />
+
+            <Button
+                android:id="@+id/btn_coroutine_finally_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_async_test"
+                android:text="@string/btn_test_finally" />
+
+            <Button
+                android:id="@+id/btn_coroutine_time_out_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_context_test"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_finally_test"
+                android:text="@string/btn_test_time_out" />
+
+            <Button
+                android:id="@+id/btn_coroutine_combined_suspend_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_test_combined"
+
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_async_test" />
+
+            <Button
+                android:id="@+id/btn_coroutine_channel_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_test_channel"
+                android:layout_marginStart="10dp"
+                app:layout_constraintLeft_toRightOf="@id/btn_coroutine_combined_suspend_test"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_async_test" />
+
+            <Button
+                android:id="@+id/btn_coroutine_async_stream_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_test_async_stream"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btn_coroutine_combined_suspend_test" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</layout>

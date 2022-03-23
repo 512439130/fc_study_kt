@@ -3,6 +3,13 @@ plugins {
     id 'kotlin-android'
 }
 
+apply plugin: 'kotlin-kapt'
+
+
+kapt {
+    generateStubs = true
+}
+
 android {
     compileSdk 32
     compileSdkVersion 29
@@ -31,6 +38,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    // Jetpack DataBinding usage
+    dataBinding {
+        enabled = true
+    }
 
 }
 
@@ -44,7 +55,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    //kotlin协程
+    // kotlin协程
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.3"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3"
+    implementation "com.google.zxing:core:3.3.3"
 }

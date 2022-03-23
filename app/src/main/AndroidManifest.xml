@@ -21,6 +21,10 @@
         <activity
             android:name=".TestClassKotlin"
             android:launchMode="singleTask"/>
+
+        <activity
+            android:name="com.fc.study.code.CodeActivity"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>
